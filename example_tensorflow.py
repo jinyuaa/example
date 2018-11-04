@@ -43,6 +43,7 @@ prediction = add_layer(h1, 20, 1, activation_function=None)
 # 需要构建损失函数，计算误差，对二者差的平方求和再取平均，得到loss函数
 # 运用梯度下降法，以0.1的学习速率最小化损失
 #add dev branch
+#add master update
 # 计算预测值和真实值间的误差
 loss = tf.reduce_mean(tf.reduce_sum(tf.square(ys - prediction), reduction_indices=[1]))
 train_step = tf.train.GradientDescentOptimizer(0.1).minimize(loss)
