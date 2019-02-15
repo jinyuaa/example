@@ -6,7 +6,9 @@ iris = datasets.load_iris()
 # 取所有行，第1列第2列
 # 为了方便绘图仅选择两个特征
 X = iris.data[:, :2]
+print(X)
 y = iris.target
+print(y)
 
 # 测试样本（绘制分类区域）
 # np.linspace(X,Y,N)在X和Y之间产生N个等间距的数列
