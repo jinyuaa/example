@@ -48,33 +48,40 @@ print(y_data.shape)
 alpha = 0.01   # 学习率
 epoch = 500    # 训练全量数据的轮数
 
+# 名字作用域和抽象节点 使数据流图更规整清晰（相比之前-0 的凌乱）
+
 # 创建线性回归模型(即数据流图)
 # 输入 X 的形状为 [47,3]
-X = tf.placeholder(tf.float32, X_data.shape)
-# 输出 y 的形状为 [47,1]
-y = tf.placeholder(tf.float32, y_data.shape)
+with tf.name_scope('input'):
+    X = tf.placeholder(tf.float32, X_data.shape, name='X')
+    # 输出 y 的形状为 [47,1]
+    y = tf.placeholder(tf.float32, y_data.shape, name='y')
 
-# 权重变量 W 形状 [3,1]
-W = tf.get_variable("weights", (X_data.shape[1], 1), initializer=tf.constant_initializer())
-# 假设函数 h(x)=w0*x0+w1*x1+w2*x2 其中x0恒为1
-# 推理值 y_pred 形状为[47,1]
-y_pred = tf.matmul(X, W)
+with tf.name_scope('hypothesis'):
+    # 权重变量 W 形状 [3,1]
+    W = tf.get_variable("weights", (X_data.shape[1], 1), initializer=tf.constant_initializer())
+    # 假设函数 h(x)=w0*x0+w1*x1+w2*x2 其中x0恒为1
+    # 推理值 y_pred 形状为[47,1]
+    y_pred = tf.matmul(X, W, name='y_pred')
 
-# 损失函数采用最小二乘法 (y_pred - y) 是形如[47,1]的向量
-# tf.matmul(a, b, transpose_a=True) 表示矩阵a的转置乘矩阵b,即[1,47]x[47,1]
-# 实现了 作差 求和 乘以 1/2n,即损失函数
-loss_op = 1 / (2 * len(X_data)) * tf.matmul((y_pred-y), (y_pred-y), transpose_a=True)
-# 随机梯度下降优化器
-opt = tf.train.GradientDescentOptimizer(learning_rate=alpha)
-# 单轮训练操作
-train_op = opt.minimize(loss_op)
+with tf.name_scope('loss'):
+    # 损失函数采用最小二乘法 (y_pred - y) 是形如[47,1]的向量
+    # tf.matmul(a, b, transpose_a=True) 表示矩阵a的转置乘矩阵b,即[1,47]x[47,1]
+    # 实现了 作差 求和 乘以 1/2n,即损失函数
+    loss_op = 1 / (2 * len(X_data)) * tf.matmul((y_pred-y), (y_pred-y), transpose_a=True)
+
+with tf.name_scope('train'):
+    # 随机梯度下降优化器
+    opt = tf.train.GradientDescentOptimizer(learning_rate=alpha)
+    # 单轮训练操作
+    train_op = opt.minimize(loss_op)
 
 # 创建会话(运行环境)
 with tf.Session() as sess:
     # 初始化全局变量
     sess.run(tf.global_variables_initializer())
-    #创建 FileWriter 实例，并传入当前会话加载的数据流
-    writer = tf.summary.FileWriter('./summary/linear-regression-0', sess.graph)
+    # 创建 FileWriter 实例，并传入当前会话加载的数据流
+    writer = tf.summary.FileWriter('./summary/linear-regression-1', sess.graph)
     # 记录所有损失值
     loss_data = []
     # 开始训练模型
@@ -92,11 +99,10 @@ with tf.Session() as sess:
 writer.close()
 
 # Epoch 500  Loss = 0.132  Model: y = 0.8304x1 + 0.0008239x2 + 4.138e-09
-'''
+
 # 可视化损失值
 sns.set(context="notebook", style="whitegrid", palette="dark")
 ax = sns.lineplot(x='epoch', y='loss', data=pd.DataFrame({'loss': loss_data, 'epoch': np.arange(epoch)}))
 ax.set_xlabel('epoch')
 ax.set_ylabel('loss')
 plt.show()
-'''
