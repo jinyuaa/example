@@ -74,15 +74,24 @@ with tf.Session() as sess:
     # 初始化全局变量
     sess.run(tf.global_variables_initializer())
 
+    # 记录所有损失值
+    loss_data = []
     # 开始训练模型
     # 因为训练集较少，所以采用梯度下降优化算法，每次都使用全量数据训练
     for step in range(1, epoch+1):
-        sess.run([train_op], feed_dict={X: X_data, y: y_data})
+        _, loss, w = sess.run([train_op, loss_op, W], feed_dict={X: X_data, y: y_data})
+        # 记录每一轮损失值变化情况
+        loss_data.append(float(loss))
         if step % 10 == 0:
-            loss, w = sess.run([loss_op, W], feed_dict={X: X_data, y: y_data})
+            # loss, w = sess.run([loss_op, W], feed_dict={X: X_data, y: y_data})
             log_str = "Epoch %d \t Loss = %.4g \t Model: y = %.4gx1 + %.4gx2 + %.4g"
             print(log_str % (step, loss, w[1], w[2], w[0]))
 
 
 # Epoch 500  Loss = 0.132  Model: y = 0.8304x1 + 0.0008239x2 + 4.138e-09
-
+# 可视化损失值
+sns.set(context="notebook", style="whitegrid", palette="dark")
+ax = sns.lineplot(x='epoch', y='loss', data=pd.DataFrame({'loss': loss_data, 'epoch': np.arange(epoch)}))
+ax.set_xlabel('epoch')
+ax.set_ylabel('loss')
+plt.show()
