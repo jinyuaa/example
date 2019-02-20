@@ -1,3 +1,5 @@
+#  MNIST-softmax模型去做手写体数字识别 使用低层的API 直接定义网络结构里面每一个模型参数
+
 from __future__ import print_function
 import tensorflow as tf
 
@@ -24,6 +26,7 @@ Y = tf.placeholder("float", [None, num_classes])
 
 # 权重和偏置
 weights = {
+    # tf.random_normal  用于从服从指定正态分布的数值中取出指定个数的值
     'h1': tf.Variable(tf.random_normal([num_input, n_hidden_1])),
     'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
     'out': tf.Variable(tf.random_normal([n_hidden_2, num_classes]))
@@ -37,7 +40,7 @@ biases = {
 
 # 定义神经网络
 def neural_net(x):
-    # 第一层隐藏层（256个神经元） layer_1 =  W * X + b  第一层隐藏层的输出结果
+    # 第一层隐藏层（256个神经元） layer_1 =  X * W + b  第一层隐藏层的输出结果
     layer_1 = tf.add(tf.matmul(x, weights['h1']), biases['b1'])
     # 第二层隐藏层（256个神经单元）
     layer_2 = tf.add(tf.matmul(layer_1, weights['h2']), biases['b2'])
@@ -46,7 +49,7 @@ def neural_net(x):
     return out_layer
 
 # 构建模型
-# X:128 x 784的数组; logits:128x10的数组
+# X: 1282x784 的数组; logits:128x10 的数组
 logits = neural_net(X)
 
 
