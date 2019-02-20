@@ -73,7 +73,8 @@ train_op = opt.minimize(loss_op)
 with tf.Session() as sess:
     # 初始化全局变量
     sess.run(tf.global_variables_initializer())
-
+    #创建 FileWriter 实例，并传入当前会话加载的数据流
+    writer = tf.summary.FileWriter('./summary/linear-regression-0', sess.graph)
     # 记录所有损失值
     loss_data = []
     # 开始训练模型
@@ -87,11 +88,15 @@ with tf.Session() as sess:
             log_str = "Epoch %d \t Loss = %.4g \t Model: y = %.4gx1 + %.4gx2 + %.4g"
             print(log_str % (step, loss, w[1], w[2], w[0]))
 
+# 关闭 FileWriter 的输出流
+writer.close()
 
 # Epoch 500  Loss = 0.132  Model: y = 0.8304x1 + 0.0008239x2 + 4.138e-09
+'''
 # 可视化损失值
 sns.set(context="notebook", style="whitegrid", palette="dark")
 ax = sns.lineplot(x='epoch', y='loss', data=pd.DataFrame({'loss': loss_data, 'epoch': np.arange(epoch)}))
 ax.set_xlabel('epoch')
 ax.set_ylabel('loss')
 plt.show()
+'''
