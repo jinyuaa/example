@@ -8,6 +8,7 @@ from keras.models import Sequential
 from keras.layers.core import Dense, Activation
 import os
 import tensorflow.gfile as gfile
+from keras.models import load_model
 
 
 from keras.datasets import mnist
@@ -91,7 +92,7 @@ plt.tight_layout()
 plt.show()
 
 # 保存模型
-save_dir = 'D:\PycharmProject\example\model'
+save_dir = 'D:/PycharmProject/example/model/'
 if gfile.Exists(save_dir):
     gfile.DeleteRecursively(save_dir)
 gfile.MakeDirs(save_dir)
@@ -101,3 +102,14 @@ model_path = os.path.join(save_dir, model_name)
 model.save(model_path)
 print('Saved trained model at %s' % model_path)
 
+# 加载模型
+mnist_model = load_model(model_path)
+loss_and_metrics = mnist_model.evaluate(X_test, Y_test, verbose=2)
+print("Test Loss : {}".format(loss_and_metrics[0]))
+print("Test Accuracy : {}%".format(loss_and_metrics[1]*100))
+
+predicted_classes = mnist_model.predict_classes(X_test)
+correct_indices = np.nonzero(predicted_classes == y_test)[0]
+incorrect_indices = np.nonzero(predicted_classes != y_test)[0]
+print("Classified correctly count : {}".format(len(correct_indices)))
+print("Classified incorrectly count : {}".format(len(incorrect_indices)))
