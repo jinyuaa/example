@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 from keras.utils import np_utils
 from keras.models import Sequential
 from keras.layers.core import Dense, Activation
+import os
+import tensorflow.gfile as gfile
+
 
 from keras.datasets import mnist
 (x_train, y_train), (x_test, y_test) = mnist.load_data('mnist\mnist.npz')
@@ -86,4 +89,15 @@ plt.legend(['train', 'test'], loc='upper right')
 plt.tight_layout()
 
 plt.show()
+
+# 保存模型
+save_dir = 'D:\PycharmProject\example\model'
+if gfile.Exists(save_dir):
+    gfile.DeleteRecursively(save_dir)
+gfile.MakeDirs(save_dir)
+
+model_name = 'keras_mnist.h5'
+model_path = os.path.join(save_dir, model_name)
+model.save(model_path)
+print('Saved trained model at %s' % model_path)
 
