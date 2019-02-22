@@ -13,10 +13,10 @@ from keras.models import load_model
 
 from keras.datasets import mnist
 (x_train, y_train), (x_test, y_test) = mnist.load_data('mnist\mnist.npz')
-# print(x_train.shape, type(x_train))
-# print(y_train.shape, type(y_train))
+# print(x_train.shape, type(x_train)) (60000,28,28)
+# print(y_train.shape, type(y_train)) (10000,)
 
-# 数据处理：规范化
+# 数据处理：规范化 把[0-255]归一化成[0,1]
 # 将图像本身从[28,28]转换成[784,]
 X_train = x_train.reshape(60000, 784)
 X_test = x_test.reshape(10000, 784)
@@ -30,6 +30,7 @@ X_train /= 255
 X_test /= 255
 
 # 统计训练数据中各标签数量 并以直方图可视
+# np.unique()函数作用：去除数组中重复数字，并进行排序之后输出
 label, count = np.unique(y_train, return_counts=True)
 print(label, count)
 fig = plt.figure()
@@ -39,6 +40,7 @@ plt.xlabel("Label")
 plt.ylabel("Count")
 plt.xticks(label)
 plt.ylim(0, 7500)
+# 显示表示每个柱状图具体值
 for a, b in zip(label, count):
     plt.text(a, b, '%d' % b, ha='center', va='bottom', fontsize=10)
 # plt.show()
@@ -63,7 +65,7 @@ model.add(Activation('relu'))
 model.add(Dense(10))
 model.add(Activation('softmax'))
 
-# 编译模型
+# 编译模型  采用交叉熵的算法计算损失
 model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
 
 # 训练模型, 并将指标保存到 history 中
@@ -91,8 +93,9 @@ plt.tight_layout()
 
 plt.show()
 
-# 保存模型
+# 保存模型  包括模型结构和参数
 save_dir = 'D:/PycharmProject/example/model/'
+# 判断文件是否存在，若存在则先执行删除操作，在创建保证无重复
 if gfile.Exists(save_dir):
     gfile.DeleteRecursively(save_dir)
 gfile.MakeDirs(save_dir)
@@ -104,12 +107,24 @@ print('Saved trained model at %s' % model_path)
 
 # 加载模型
 mnist_model = load_model(model_path)
+# 评估 evaluate 训练好的模型在测试集上的表现
 loss_and_metrics = mnist_model.evaluate(X_test, Y_test, verbose=2)
 print("Test Loss : {}".format(loss_and_metrics[0]))
 print("Test Accuracy : {}%".format(loss_and_metrics[1]*100))
 
 predicted_classes = mnist_model.predict_classes(X_test)
+
 correct_indices = np.nonzero(predicted_classes == y_test)[0]
 incorrect_indices = np.nonzero(predicted_classes != y_test)[0]
 print("Classified correctly count : {}".format(len(correct_indices)))
 print("Classified incorrectly count : {}".format(len(incorrect_indices)))
+
+# 选择9个预测正确的进行打印
+plt.figure()
+for i, correct in enumerate(correct_indices[:9]):
+    plt.subplot(3, 3, i+1)
+    plt.imshow(X_test[correct].reshape(28, 28), cmap='gray', interpolation='none')
+    plt.title("predicted {}, class {}".format(predicted_classes[correct], y_test[correct]))
+plt.show()
+
+# 选择9个预测错误的进行打印
