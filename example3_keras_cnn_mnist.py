@@ -15,14 +15,14 @@ from keras.models import load_model
 from keras.datasets import mnist
 
 (x_train, y_train), (x_test, y_test) = mnist.load_data('mnist\mnist.npz')
-#  print(x_train.shape, type(x_train))
+# print(x_train.shape, type(x_train))
 
 # 数据处理: 规范化
 img_rows, img_cols = 28, 28
-
+# 本数据集为灰度图片通道数为1 当涉及RGB格式则不同，一般使用channels_last格式
 if K.image_data_format() == 'channels_first':
     x_train = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols)
-    x_test = x_test.reshape(x_test.shape [0], 1, img_rows, img_cols)
+    x_test = x_test.reshape(x_test.shape[0], 1, img_rows, img_cols)
     input_shape = [1, img_rows, img_cols]
 else:
     x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols, 1)
@@ -34,7 +34,7 @@ else:
 # 将数据类型转换成 float32
 X_train = x_train.astype('float32')
 X_test = x_test.astype('float32')
-# 数据归一化
+# 数据归一化 [0,1]
 X_train /= 255
 X_test /= 255
 
@@ -52,6 +52,7 @@ plt.xticks(label)
 plt.ylim(0, 7500)
 # 显示表示每个柱状图具体值
 for a, b in zip(label, count):
+    # ha(horizontal alignment)水平对齐方式; va(vertical alignment)垂直对齐方式
     plt.text(a, b, '%d' % b, ha='center', va='bottom', fontsize=10)
 plt.show()
 
@@ -59,8 +60,8 @@ plt.show()
 n_classes = 10
 Y_train = np_utils.to_categorical(y_train, n_classes)
 Y_test = np_utils.to_categorical(y_test, n_classes)
-print(y_train[2])
-print(Y_train[2])
+print(y_train[2])   # 4
+print(Y_train[2])   # [0 0 0 0 1 0 0 0 0 0]
 
 # 使用 Keras sequential model 定义 MNIST CNN 网络
 model = Sequential()
