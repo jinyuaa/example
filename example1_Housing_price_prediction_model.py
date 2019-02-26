@@ -4,9 +4,6 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import seaborn as sns
 from mpl_toolkits import mplot3d
-from keras import backend as K
-
-K.clear_session()
 
 '''
 # 单变量房价预测模型
@@ -78,7 +75,6 @@ with tf.name_scope('train'):
     opt = tf.train.GradientDescentOptimizer(learning_rate=alpha)
     # 单轮训练操作
     train_op = opt.minimize(loss_op)
-
 
 # 创建会话(运行环境)
 with tf.Session() as sess:
